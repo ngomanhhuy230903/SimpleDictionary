@@ -57,6 +57,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
             startActivity(intent);
         });
+        binding.btnFavorite.setOnClickListener(v -> { // Giả sử id nút là btn_favorite
+            Intent intent = new Intent(MainActivity.this, FavoriteActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void setupRecyclerView() {

@@ -11,10 +11,13 @@ import com.example.simpledictionary.databinding.ActivityWordDetailBinding;
 import com.example.simpledictionary.model.Definition;
 import com.example.simpledictionary.model.Word;
 import com.example.simpledictionary.model.WordMeaning;
-
+import com.example.simpledictionary.database.FavoriteDAO;
 public class WordDetailActivity extends AppCompatActivity {
 
     private ActivityWordDetailBinding binding;
+    private FavoriteDAO favoriteDAO;
+    private Word currentWord;
+    private boolean isCurrentlyFavorite;
     public static final String EXTRA_WORD = "EXTRA_WORD"; // Key để gửi và nhận dữ liệu
 
     @Override
@@ -22,7 +25,8 @@ public class WordDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityWordDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        favoriteDAO = new FavoriteDAO(this);
+        favoriteDAO.open();
         // Lấy dữ liệu Word được gửi từ MainActivity
         Word word = (Word) getIntent().getSerializableExtra(EXTRA_WORD);
 
@@ -77,5 +81,42 @@ public class WordDetailActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+    private void setupFavoriteButton() {
+        // 1. Kiểm tra trạng thái yêu thích ban đầu
+        isCurrentlyFavorite = favoriteDAO.isFavorite(currentWord.getWord());
+        updateFavoriteIcon();
+
+        // 2. Thiết lập sự kiện click
+        binding.ibFavorite.setOnClickListener(v -> {
+            // Đảo ngược trạng thái
+            isCurrentlyFavorite = !isCurrentlyFavorite;
+
+            if (isCurrentlyFavorite) {
+                // Nếu giờ là yêu thích -> thêm vào DB
+                favoriteDAO.addFavorite(currentWord.getWord());
+            } else {
+                // Nếu không còn yêu thích -> xóa khỏi DB
+                favoriteDAO.removeFavorite(currentWord.getWord());
+            }
+
+            // Cập nhật lại icon sau khi thay đổi
+            updateFavoriteIcon();
+        });
+    }
+
+    private void updateFavoriteIcon() {
+        if (isCurrentlyFavorite) {
+            binding.ibFavorite.setImageResource(R.drawable.ic_favorite_filled);
+        } else {
+            binding.ibFavorite.setImageResource(R.drawable.ic_favorite_border);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Đừng quên đóng kết nối DAO
+        favoriteDAO.close();
     }
 }
