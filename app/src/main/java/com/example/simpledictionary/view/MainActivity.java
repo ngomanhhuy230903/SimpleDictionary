@@ -1,5 +1,6 @@
 package com.example.simpledictionary.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,7 +14,7 @@ import com.example.simpledictionary.api.DictionaryAPI;
 import com.example.simpledictionary.api.RetrofitClient;
 import com.example.simpledictionary.databinding.ActivityMainBinding;
 import com.example.simpledictionary.model.Word;
-
+import com.example.simpledictionary.database.HistoryDAO;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +26,18 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private WordAdapter wordAdapter;
+    private HistoryDAO historyDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        // Khởi tạo DAO cho lịch sử
+        historyDAO = new HistoryDAO(this);
+        historyDAO.open();
         // 1. Cài đặt RecyclerView và Adapter
+
         setupRecyclerView();
 
         // 2. Thiết lập sự kiện click cho nút tìm kiếm
@@ -46,6 +51,11 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Vui lòng nhập từ khóa", Toast.LENGTH_SHORT).show();
                 }
             }
+
+        });
+        binding.btnHistory.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -56,6 +66,11 @@ public class MainActivity extends AppCompatActivity {
         binding.rvResultList.setLayoutManager(new LinearLayoutManager(this));
         // Gắn adapter vào RecyclerView
         binding.rvResultList.setAdapter(wordAdapter);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        historyDAO.close();
     }
 
     private void searchWord(String word) {
@@ -73,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     // Nếu thành công, cập nhật dữ liệu cho adapter
                     wordAdapter.updateData(response.body());
+                    historyDAO.addHistory(word);
                 } else {
                     // Nếu không tìm thấy từ hoặc có lỗi từ server
                     Toast.makeText(MainActivity.this, "Không tìm thấy từ hoặc có lỗi", Toast.LENGTH_SHORT).show();
