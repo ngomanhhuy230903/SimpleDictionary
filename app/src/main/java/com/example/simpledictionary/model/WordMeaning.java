@@ -1,8 +1,8 @@
 package com.example.simpledictionary.model;
 
+import java.io.Serializable;
 import java.util.List;
-
-public class WordMeaning {
+public class WordMeaning implements Serializable {
     private String partOfSpeech; // Loại từ
 
     // THAY ĐỔI QUAN TRỌNG Ở ĐÂY

@@ -1,9 +1,8 @@
 package com.example.simpledictionary.model;
 
+import java.io.Serializable;
 import java.util.List;
-
-// Lớp này đại diện cho một từ vựng hoàn chỉnh
-public class Word {
+public class Word implements Serializable {
     private String word; // Từ vựng, ví dụ: "hello"
     private String phonetic; // Phiên âm, ví dụ: /həˈloʊ/
     private List<WordMeaning> meanings; // Danh sách các nghĩa của từ

@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.example.simpledictionary.view.WordDetailActivity;
 import com.example.simpledictionary.R;
 import com.example.simpledictionary.model.Word;
 
@@ -52,6 +52,23 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.WordViewHolder
         // Gán dữ liệu lên các view của ViewHolder
         holder.tvWord.setText(currentWord.getWord());
         holder.tvPhonetic.setText(currentWord.getPhonetic());
+
+        // --- BẮT ĐẦU THÊM CODE MỚI ---
+        holder.itemView.setOnClickListener(v -> {
+            // Lấy context từ view item (cần thiết để khởi động Activity mới)
+            android.content.Context context = holder.itemView.getContext();
+
+            // Tạo một Intent để mở WordDetailActivity
+            android.content.Intent intent = new android.content.Intent(context, WordDetailActivity.class);
+
+            // Đính kèm đối tượng Word hiện tại vào Intent
+            // WordDetailActivity.EXTRA_WORD là key để lấy dữ liệu ra
+            intent.putExtra(WordDetailActivity.EXTRA_WORD, currentWord);
+
+            // Khởi động Activity mới
+            context.startActivity(intent);
+        });
+        // --- KẾT THÚC CODE MỚI ---
     }
 
     // Trả về tổng số item trong danh sách
@@ -67,5 +84,6 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.WordViewHolder
             this.wordList.addAll(newWordList);
         }
         notifyDataSetChanged(); // Yêu cầu RecyclerView vẽ lại toàn bộ danh sách
+
     }
 }
