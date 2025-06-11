@@ -2,6 +2,8 @@ package com.example.simpledictionary.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -60,6 +62,26 @@ public class MainActivity extends AppCompatActivity {
         binding.btnFavorite.setOnClickListener(v -> { // Giả sử id nút là btn_favorite
             Intent intent = new Intent(MainActivity.this, FavoriteActivity.class);
             startActivity(intent);
+        });
+        binding.etSearchWord.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Không cần làm gì ở đây
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Không cần làm gì ở đây
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Sau khi người dùng thay đổi text
+                if (s.toString().isEmpty()) {
+                    // Nếu ô tìm kiếm trống, xóa danh sách kết quả
+                    wordAdapter.updateData(new ArrayList<>());
+                }
+            }
         });
     }
 
